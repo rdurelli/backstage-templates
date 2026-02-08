@@ -1,0 +1,55 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: java-basic
+  title: Java Basic Project
+  description: Cria um projeto Java básico
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Informações do Projeto
+      required:
+        - name
+        - owner
+      properties:
+        name:
+          title: Nome do projeto
+          type: string
+          description: Ex: hello-java
+        owner:
+          title: Owner
+          type: string
+          description: Ex: group:default
+
+  steps:
+    - id: fetch
+      name: Criando projeto base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+
+    - id: publish
+      name: Publicando no GitHub
+      action: publish:github
+      input:
+        repoUrl: github.com?owner=rdurelli&repo=${{ parameters.name }}
+        description: Projeto Java básico criado via Backstage
+        defaultBranch: main
+
+    - id: register
+      name: Registrando no Catálogo
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repositório
+        url: ${{ steps.publish.output.remoteUrl }}
+
