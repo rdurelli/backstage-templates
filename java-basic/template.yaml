@@ -17,11 +17,11 @@ spec:
         name:
           title: Nome do projeto
           type: string
-          description: Ex: hello-java
+          description: "Ex: hello-java"
         owner:
           title: Owner
           type: string
-          description: Ex: group:default
+          description: "Ex: group:default"
 
   steps:
     - id: fetch
@@ -52,4 +52,3 @@ spec:
     links:
       - title: Repositório
         url: ${{ steps.publish.output.remoteUrl }}
-
