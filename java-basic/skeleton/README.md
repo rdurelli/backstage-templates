@@ -1,4 +1,4 @@
-# {{ name }}
+# ${{ values.name }}
 
 Projeto Java básico criado com Backstage.
 
