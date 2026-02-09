@@ -3,6 +3,6 @@ package com.example;
 public class App {
 
     public static void main(String[] args) {
-        System.out.println("Hello from {{ name }}!");
+        System.out.println("Hello from ${{ values.name }}!");
     }
 }
