@@ -1,8 +1,12 @@
 package com.example;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class App {
 
     public static void main(String[] args) {
-        System.out.println("Hello from ${{ values.name }}!");
+        SpringApplication.run(App.class, args);
     }
 }
