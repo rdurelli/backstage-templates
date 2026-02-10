@@ -12,7 +12,8 @@ permissions:
   pull-requests: write
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
+  DOCKERHUB_USERNAME: durellirsd
+  REPO_NAME: ${{ github.event.repository.name }}
 
 jobs:
   test:
@@ -45,8 +46,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    outputs:
-      image_tag: ${{ steps.meta.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,28 +63,18 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+          username: durellirsd
+          password: dckr_pat_7roKCZzpjApIdNxElJDQgRJF-ic
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: durellirsd/${{ values.name }}:latest
 
       - name: Image digest
-        run: echo "Image pushed with tags:\ ${{ steps.meta.outputs.tags }}"
+        run: echo "Image pushed as durellirsd/${{ values.name }}:latest"
 
   update-manifests:
     name: Update Kubernetes Manifests
@@ -100,8 +89,7 @@ jobs:
 
       - name: Update image tag in deployment
         run: |
-          IMAGE_TAG="${{ needs.build-and-push.outputs.image_tag }}"
-          sed -i "s|IMAGE_TAG|${IMAGE_TAG}|g" k8s/deployment.yaml
+          sed -i "s|IMAGE_TAG|latest|g" k8s/deployment.yaml
           cat k8s/deployment.yaml
 
       - name: Commit and push changes
@@ -112,6 +100,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: Update image tag to ${{ needs.build-and-push.outputs.image_tag }}"
+            git commit -m "chore: Update image tag to latest"
             git push
           fi
